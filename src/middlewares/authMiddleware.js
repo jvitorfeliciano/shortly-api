@@ -27,7 +27,6 @@ export const checkEmailExistence = async (req, res, next) => {
     if (rowCount > 0) {
       return res.status(409).send({ message: "User already registered" });
     }
-    res.send(user);
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
