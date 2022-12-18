@@ -1,4 +1,5 @@
 import connectionDB from "../database/db.js";
+import signInSchema from "../models/signInSchema.js";
 import signUpSchema from "../models/signUpSchema.js";
 
 export const validateSignUpSchema = (req, res, next) => {
@@ -31,5 +32,20 @@ export const checkEmailExistence = async (req, res, next) => {
     return res.status(500).send({ message: err.message });
   }
 
+  return next();
+};
+
+export const validateSignInSchema = (req, res, next) => {
+  const signInInformations = req.body;
+
+  const { error } = signInSchema.validate(signInInformations, {
+    abortEarly: false,
+  });
+
+  if (error) {
+    const errors = error.details.map((detail) => detail.message);
+    return res.status(422).send(errors);
+  }
+  res.locals.signInInformations = signInInformations;
   return next();
 };
