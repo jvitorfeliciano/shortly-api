@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { validateSignUpSchema } from "../middlewares/authMiddleware.js";
+import { checkEmailExistence, validateSignUpSchema } from "../middlewares/authMiddleware.js";
 
 const authRouter = Router();
 
-authRouter.post("/signup", validateSignUpSchema);
+authRouter.post("/signup", validateSignUpSchema, checkEmailExistence);
 
 export default authRouter;
