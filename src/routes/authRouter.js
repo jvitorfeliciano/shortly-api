@@ -1,14 +1,23 @@
 import { Router } from "express";
 import { postUser } from "../controllers/authController.js";
 import {
-    checkEmailAndPasswordMatch,
-  checkEmailExistence,
-  validateSignInSchema,
-  validateSignUpSchema,
+  emailAndPasswordMatchValidation,
+  emailExistenceValidation,
+  signInSchemaValidation,
+  signUpSchemaValidation,
 } from "../middlewares/authMiddleware.js";
 
 const authRouter = Router();
 
-authRouter.post("/signup", validateSignUpSchema, checkEmailExistence, postUser);
-authRouter.post("/signin", validateSignInSchema, checkEmailAndPasswordMatch);
+authRouter.post(
+  "/signup",
+  signUpSchemaValidation,
+  emailExistenceValidation,
+  postUser
+);
+authRouter.post(
+  "/signin",
+  signInSchemaValidation,
+  emailAndPasswordMatchValidation
+);
 export default authRouter;

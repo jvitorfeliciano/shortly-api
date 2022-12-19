@@ -3,7 +3,7 @@ import signInSchema from "../models/signInSchema.js";
 import signUpSchema from "../models/signUpSchema.js";
 import bcrypt from "bcrypt";
 
-export const validateSignUpSchema = (req, res, next) => {
+export const signUpSchemaValidation = (req, res, next) => {
   const signUpInformations = req.body;
 
   const { error } = signUpSchema.validate(signUpInformations, {
@@ -18,7 +18,7 @@ export const validateSignUpSchema = (req, res, next) => {
   return next();
 };
 
-export const checkEmailExistence = async (req, res, next) => {
+export const emailExistenceValidation = async (req, res, next) => {
   const { email } = res.locals.signUpInformations;
 
   try {
@@ -36,7 +36,7 @@ export const checkEmailExistence = async (req, res, next) => {
   return next();
 };
 
-export const validateSignInSchema = (req, res, next) => {
+export const signInSchemaValidation = (req, res, next) => {
   const signInInformations = req.body;
 
   const { error } = signInSchema.validate(signInInformations, {
@@ -51,7 +51,7 @@ export const validateSignInSchema = (req, res, next) => {
   return next();
 };
 
-export const checkEmailAndPasswordMatch = async (req, res, next) => {
+export const emailAndPasswordMatchValidation = async (req, res, next) => {
   const { email, password } = res.locals.signInInformations;
 
   try {
