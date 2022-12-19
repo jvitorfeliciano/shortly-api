@@ -1,4 +1,3 @@
-import connectionDB from "../database/db.js";
 import urlSchema from "../models/urlSchema.js";
 
 export const urlSchemaValidation = (req, res, next) => {
