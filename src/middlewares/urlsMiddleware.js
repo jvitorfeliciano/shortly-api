@@ -1,3 +1,4 @@
+import connectionDB from "../database/db.js";
 import urlSchema from "../models/urlSchema.js";
 
 export const urlSchemaValidation = (req, res, next) => {
@@ -22,7 +23,24 @@ export const urlExistenceValidation = async (req, res, next) => {
       [id]
     );
     if (rowCount === 0) {
-      return res.status(409).send({ message: "Url not found" });
+      return res.status(404).send({ message: "Url not found" });
+    }
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+  return next();
+};
+
+export const shortUrlExistenceValidation = async (req, res, next) => {
+  const { shortUrl } = req.params;
+  console.log(shortUrl);
+  try {
+    const { rowCount } = await connectionDB.query(
+      'SELECT * FROM  urls WHERE "shortUrl"=$1',
+      [shortUrl]
+    );
+    if (rowCount === 0) {
+      return res.status(404).send({ message: "Short url not found" });
     }
   } catch (err) {
     return res.status(500).send({ message: err.message });
