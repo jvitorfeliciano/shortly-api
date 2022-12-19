@@ -1,6 +1,7 @@
 import connectionDB from "../database/db.js";
 import signInSchema from "../models/signInSchema.js";
 import signUpSchema from "../models/signUpSchema.js";
+import bcrypt from "bcrypt";
 
 export const validateSignUpSchema = (req, res, next) => {
   const signUpInformations = req.body;
@@ -48,4 +49,26 @@ export const validateSignInSchema = (req, res, next) => {
   }
   res.locals.signInInformations = signInInformations;
   return next();
+};
+
+export const checkEmailAndPasswordMatch = async (req, res, next) => {
+  const { email, password } = res.locals.signInInformations;
+
+  try {
+    const user = await connectionDB.query(
+      "SELECT * FROM users WHERE email=$1",
+      [email]
+    );
+    if (
+      user.rowCount > 0 &&
+      bcrypt.compareSync(password, user.rows[0].password)
+    ) {
+      res.locals.userInformations = user.rows[0];
+      return next();
+    } else {
+      return res.sendStatus(401);
+    }
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
 };
