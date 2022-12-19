@@ -77,33 +77,31 @@ export const emailAndPasswordMatchValidation = async (req, res, next) => {
   }
 };
 
-export const validTokenValidation = async (req, res, next) => {
+export const validTokenValidation = (req, res, next) => {
   const { authorization } = req.headers;
   const token = authorization?.replace("Bearer ", "");
-  let userId;
 
   if (!token) {
     return res.status(401).send({ message: "Invalid token" });
   }
 
-  jwt.verify(token, process.env.SECRET_JWT, (error, decoded) => {
+  jwt.verify(token, process.env.SECRET_JWT, async (error, decoded) => {
     if (error) {
       return res.status(401).send({ message: "Invalid token" });
     }
-    userId = decoded.id;
-  });
-  
-  try {
-    const { rowCount } = await connectionDB.query(
-      "SELECT * FROM users WHERE id=$1",
-      [userId]
-    );
-    if (rowCount === 0) {
-      return res.status(404).send({ message: "User not found" });
+
+    try {
+      const { rowCount } = await connectionDB.query(
+        "SELECT * FROM users WHERE id=$1",
+        [decoded.id]
+      );
+      if (rowCount === 0) {
+        return res.status(404).send({ message: "User not found" });
+      }
+    } catch (err) {
+      return res.status(500).send({ message: err.message });
     }
-  } catch (err) {
-    return res.status(500).send({ message: err.message });
-  }
-  res.locals.userId = userId;
-  return next();
+    res.locals.userId = decoded.id;
+    return next();
+  });
 };
