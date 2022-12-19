@@ -20,3 +20,19 @@ export const postShortUrl = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+export const getUrlById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { rows } = await connectionDB.query(
+      `SELECT id, "shortUrl", url 
+       FROM  urls 
+       WHERE id=$1`,
+      [id]
+    );
+    return res.status(200).send(rows[0]);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};

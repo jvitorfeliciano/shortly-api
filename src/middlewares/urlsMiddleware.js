@@ -11,7 +11,7 @@ export const urlSchemaValidation = (req, res, next) => {
     return res.status(422).send(errors);
   }
   res.locals.urlInformation = urlInformation;
-  next();
+  return next();
 };
 
 export const urlExistenceValidation = async (req, res, next) => {
@@ -28,4 +28,5 @@ export const urlExistenceValidation = async (req, res, next) => {
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
+  return next();
 };
