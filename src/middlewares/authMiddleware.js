@@ -2,6 +2,10 @@ import connectionDB from "../database/db.js";
 import signInSchema from "../models/signInSchema.js";
 import signUpSchema from "../models/signUpSchema.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const signUpSchemaValidation = (req, res, next) => {
   const signUpInformations = req.body;
@@ -71,4 +75,35 @@ export const emailAndPasswordMatchValidation = async (req, res, next) => {
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
+};
+
+export const validTokenValidation = async (req, res, next) => {
+  const { authorization } = req.headers;
+  const token = authorization?.replace("Bearer ", "");
+  let userId;
+
+  if (!token) {
+    return res.status(401).send({ message: "Invalid token" });
+  }
+
+  jwt.verify(token, process.env.SECRET_JWT, (error, decoded) => {
+    if (error) {
+      return res.status(401).send({ message: "Invalid token" });
+    }
+    userId = decoded.id;
+  });
+  
+  try {
+    const { rowCount } = await connectionDB.query(
+      "SELECT * FROM users WHERE id=$1",
+      [userId]
+    );
+    if (rowCount === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+  res.locals.userId = userId;
+  return next();
 };
