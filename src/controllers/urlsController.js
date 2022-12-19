@@ -39,6 +39,7 @@ export const getUrlById = async (req, res) => {
 
 export const redirectToTheCorrespondingLink = async (req, res) => {
   const { shortUrl } = req.params;
+
   try {
     await connectionDB.query(
       `UPDATE urls 
@@ -50,8 +51,10 @@ export const redirectToTheCorrespondingLink = async (req, res) => {
       'SELECT * FROM  urls WHERE "shortUrl"=$1',
       [shortUrl]
     );
-    res.redirect(rows[0].url);
+    return res.redirect(rows[0].url);
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
 };
+
+

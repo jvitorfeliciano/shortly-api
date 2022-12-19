@@ -28,6 +28,7 @@ export const urlExistenceValidation = async (req, res, next) => {
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
+
   return next();
 };
 
@@ -45,5 +46,28 @@ export const shortUrlExistenceValidation = async (req, res, next) => {
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
+  return next();
+};
+
+export const urlOwnerValidation = async (req, res, next) => {
+  const { id } = req.params;
+  const userId = res.locals.userId;
+
+  try {
+    const { rows } = await connectionDB.query(
+      "SELECT * FROM  urls WHERE id=$1",
+      [id]
+    );
+
+    const userIdStored = rows[0].userId;
+    if (userId !== userIdStored) {
+      return res
+        .status(401)
+        .send({ message: "Url not registered in your domain" });
+    }
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+
   return next();
 };
