@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { postUser } from "../controllers/authController.js";
+import { signIn, signUp } from "../controllers/authController.js";
 import {
   emailAndPasswordMatchValidation,
   emailExistenceValidation,
@@ -13,11 +13,12 @@ authRouter.post(
   "/signup",
   signUpSchemaValidation,
   emailExistenceValidation,
-  postUser
+  signUp
 );
 authRouter.post(
   "/signin",
   signInSchemaValidation,
-  emailAndPasswordMatchValidation
+  emailAndPasswordMatchValidation,
+  signIn
 );
 export default authRouter;
