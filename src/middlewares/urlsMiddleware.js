@@ -33,7 +33,7 @@ export const urlExistenceValidation = async (req, res, next) => {
 
 export const shortUrlExistenceValidation = async (req, res, next) => {
   const { shortUrl } = req.params;
-  console.log(shortUrl);
+
   try {
     const { rowCount } = await connectionDB.query(
       'SELECT * FROM  urls WHERE "shortUrl"=$1',
