@@ -60,6 +60,7 @@ export const urlOwnerValidation = async (req, res, next) => {
     );
 
     const userIdStored = rows[0].userId;
+    console.log(userIdStored)
     if (userId !== userIdStored) {
       return res
         .status(401)

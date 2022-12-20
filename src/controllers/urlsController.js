@@ -57,4 +57,13 @@ export const redirectToTheCorrespondingLink = async (req, res) => {
   }
 };
 
+export const deleteUrl = async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    await connectionDB.query("DELETE FROM  urls WHERE id=$1", [id]);
+    return res.sendStatus(204);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};

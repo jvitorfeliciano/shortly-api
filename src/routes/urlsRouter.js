@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  deleteUrl,
   getUrlById,
   postShortUrl,
   redirectToTheCorrespondingLink,
@@ -20,11 +21,20 @@ urlsRouter.post(
   urlSchemaValidation,
   postShortUrl
 );
+
 urlsRouter.get("/urls/:id", urlExistenceValidation, getUrlById);
+
 urlsRouter.get(
   "/urls/open/:shortUrl",
   shortUrlExistenceValidation,
   redirectToTheCorrespondingLink
 );
-urlsRouter.delete("/urls/:id", validTokenValidation, urlExistenceValidation, urlOwnerValidation);
+
+urlsRouter.delete(
+  "/urls/:id",
+  validTokenValidation,
+  urlExistenceValidation,
+  urlOwnerValidation,
+  deleteUrl
+);
 export default urlsRouter;
