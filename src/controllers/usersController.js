@@ -4,8 +4,9 @@ export const getUsersUrls = async (req, res) => {
   const userId = res.locals.userId;
 
   try {
-    const userInformation = await connectionDB.query(
-      `SELECT users.id, users.name, SUM(urls."visitCount") AS "visitCount" 
+    const userData = await connectionDB.query(
+      `SELECT users.id, users.name, SUM(urls."visitCount") AS "visitCount",
+       JSON_AGG(JSON_BUILD_OBJECT('id',urls.id, 'shortUrl', urls."shortUrl",'url', urls.url, 'visitCount', urls."visitCount")) AS "shortenedUrls"
        FROM   users 
        JOIN urls ON users.id = urls."userId"
        WHERE users.id=$1
@@ -13,13 +14,8 @@ export const getUsersUrls = async (req, res) => {
       `,
       [userId]
     );
-    const urls = await connectionDB.query(
-      `SELECT id, "shortUrl", url, "visitCount" FROM urls WHERE "userId" = $1`,
-      [userId]
-    );
 
-    userInformation.rows[0].shortenedUrls = urls.rows;
-    return res.send(userInformation.rows[0]);
+    return res.send(userData.rows[0]);
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
