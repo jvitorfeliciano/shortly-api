@@ -13,8 +13,21 @@ const getUsersUrls = (userId) => {
   );
 };
 
+const getUsersData = (userId) => {
+  return connectionDB.query(
+    `SELECT users.id, users.name
+     FROM users 
+     WHERE users.id=$1
+          `,
+    [userId]
+  );
+};
+
 const usersRepository = {
   getUsersUrls,
+  getUsersData,
 };
 
 export default usersRepository;
+
+/* eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjcxODI1ODkzfQ.iRGdOqXvxtWUnvfA7wnVTO9SIh4ljIUVFIeZsZts4Fs */
