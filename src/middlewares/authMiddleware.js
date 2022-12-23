@@ -66,7 +66,7 @@ export const emailAndPasswordMatchValidation = async (req, res, next) => {
       res.locals.userInformations = user.rows[0];
       return next();
     } else {
-      return res.status(401).send({message:"Email or password incorrect"});
+      return res.status(401).send({ message: "Email or password incorrect" });
     }
   } catch (err) {
     return res.status(500).send({ message: err.message });
@@ -92,7 +92,6 @@ export const validTokenValidation = (req, res, next) => {
       if (rowCount === 0) {
         return res.status(404).send({ message: "User not found" });
       }
-
     } catch (err) {
       return res.status(500).send({ message: err.message });
     }

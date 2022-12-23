@@ -20,9 +20,7 @@ export const signUp = async (req, res) => {
 
 export const signIn = async (req, res) => {
   const { id, name } = res.locals.userInformations;
-  const token = jwt.sign({ id: id }, process.env.SECRET_JWT, {
-    expiresIn: 86400,
-  });
+  const token = jwt.sign({ id: id }, process.env.SECRET_JWT);
 
   try {
     return res.status(200).send({ name, token });
