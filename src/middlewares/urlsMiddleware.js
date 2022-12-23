@@ -1,5 +1,5 @@
-import connectionDB from "../database/db.js";
 import urlSchema from "../models/urlSchema.js";
+import urlsRepository from "../repositories/urlsRepository.js";
 
 export const urlSchemaValidation = (req, res, next) => {
   const urlInformation = req.body;
@@ -18,10 +18,8 @@ export const urlExistenceValidation = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const { rowCount } = await connectionDB.query(
-      "SELECT * FROM  urls WHERE id=$1",
-      [id]
-    );
+    const { rowCount } = await urlsRepository.getUrlById(id);
+
     if (rowCount === 0) {
       return res.status(404).send({ message: "Url not found" });
     }
@@ -36,10 +34,8 @@ export const shortUrlExistenceValidation = async (req, res, next) => {
   const { shortUrl } = req.params;
 
   try {
-    const { rowCount } = await connectionDB.query(
-      'SELECT * FROM  urls WHERE "shortUrl"=$1',
-      [shortUrl]
-    );
+    const { rowCount } = await urlsRepository.getUrlByItsShortVersion(shortUrl);
+
     if (rowCount === 0) {
       return res.status(404).send({ message: "Short url not found" });
     }
@@ -54,13 +50,10 @@ export const urlOwnerValidation = async (req, res, next) => {
   const userId = res.locals.userId;
 
   try {
-    const { rows } = await connectionDB.query(
-      "SELECT * FROM  urls WHERE id=$1",
-      [id]
-    );
+    const { rows } = await urlsRepository.getUrlById(id);
 
-    const userIdStored = rows[0].userId;
-    console.log(userIdStored)
+    const userIdStored = rows[0].user_id;
+
     if (userId !== userIdStored) {
       return res
         .status(401)

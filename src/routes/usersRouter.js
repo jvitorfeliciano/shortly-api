@@ -4,6 +4,6 @@ import { validTokenValidation } from "../middlewares/authMiddleware.js";
 
 const usersRouter = Router();
 
-usersRouter.get("/users/me", validTokenValidation,getUsersUrls)
+usersRouter.get("/users/me", validTokenValidation, getUsersUrls);
 
 export default usersRouter;

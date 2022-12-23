@@ -1,5 +1,5 @@
 import { customAlphabet } from "nanoid";
-import connectionDB from "../database/db.js";
+import urlsRepository from "../repositories/urlsRepository.js";
 
 export const postShortUrl = async (req, res) => {
   const { url } = res.locals.urlInformation;
@@ -8,12 +8,7 @@ export const postShortUrl = async (req, res) => {
   const shortUrl = nanoid();
 
   try {
-    await connectionDB.query(
-      `INSERT INTO urls ("shortUrl", url, "userId")
-       VALUES ($1,$2,$3)
-          `,
-      [shortUrl, url, userId]
-    );
+    await urlsRepository.insertUrl(shortUrl, url, userId);
 
     return res.status(201).send({ shortUrl: shortUrl });
   } catch (err) {
@@ -25,12 +20,7 @@ export const getUrlById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const { rows } = await connectionDB.query(
-      `SELECT id, "shortUrl", url 
-       FROM  urls 
-       WHERE id=$1`,
-      [id]
-    );
+    const { rows } = await urlsRepository.getFormattedUrlById(id);
     return res.status(200).send(rows[0]);
   } catch (err) {
     return res.status(500).send({ message: err.message });
@@ -41,16 +31,9 @@ export const redirectToTheCorrespondingLink = async (req, res) => {
   const { shortUrl } = req.params;
 
   try {
-    await connectionDB.query(
-      `UPDATE urls 
-       SET "visitCount" = "visitCount"+1
-       WHERE "shortUrl"=$1`,
-      [shortUrl]
-    );
-    const { rows } = await connectionDB.query(
-      'SELECT * FROM  urls WHERE "shortUrl"=$1',
-      [shortUrl]
-    );
+    await urlsRepository.updateVisitCount(shortUrl);
+    const { rows } = await urlsRepository.getUrlByItsShortVersion(shortUrl);
+
     return res.redirect(rows[0].url);
   } catch (err) {
     return res.status(500).send({ message: err.message });
@@ -61,7 +44,7 @@ export const deleteUrl = async (req, res) => {
   const { id } = req.params;
 
   try {
-    await connectionDB.query("DELETE FROM  urls WHERE id=$1", [id]);
+    await urlsRepository.deleteUrl(id);
     return res.sendStatus(204);
   } catch (err) {
     return res.status(500).send({ message: err.message });

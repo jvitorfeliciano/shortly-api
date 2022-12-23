@@ -1,9 +1,9 @@
-import connectionDB from "../database/db.js";
 import signInSchema from "../models/signInSchema.js";
 import signUpSchema from "../models/signUpSchema.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import authRepository from "../repositories/authRepository.js";
 
 dotenv.config();
 
@@ -26,10 +26,8 @@ export const emailExistenceValidation = async (req, res, next) => {
   const { email } = res.locals.signUpInformations;
 
   try {
-    const { rowCount } = await connectionDB.query(
-      "SELECT * FROM users WHERE email=$1",
-      [email]
-    );
+    const { rowCount } = await authRepository.getUserByEmail(email);
+
     if (rowCount > 0) {
       return res.status(409).send({ message: "User already registered" });
     }
@@ -59,10 +57,8 @@ export const emailAndPasswordMatchValidation = async (req, res, next) => {
   const { email, password } = res.locals.signInInformations;
 
   try {
-    const user = await connectionDB.query(
-      "SELECT * FROM users WHERE email=$1",
-      [email]
-    );
+    const user = await authRepository.getUserByEmail(email);
+
     if (
       user.rowCount > 0 &&
       bcrypt.compareSync(password, user.rows[0].password)
@@ -70,7 +66,7 @@ export const emailAndPasswordMatchValidation = async (req, res, next) => {
       res.locals.userInformations = user.rows[0];
       return next();
     } else {
-      return res.sendStatus(401);
+      return res.status(401).send({message:"Email or password incorrect"});
     }
   } catch (err) {
     return res.status(500).send({ message: err.message });
@@ -91,13 +87,12 @@ export const validTokenValidation = (req, res, next) => {
     }
 
     try {
-      const { rowCount } = await connectionDB.query(
-        "SELECT * FROM users WHERE id=$1",
-        [decoded.id]
-      );
+      const { rowCount } = await authRepository.getUserById(decoded.id);
+
       if (rowCount === 0) {
         return res.status(404).send({ message: "User not found" });
       }
+
     } catch (err) {
       return res.status(500).send({ message: err.message });
     }
